@@ -1,0 +1,43 @@
+.addmedbox{
+    background-color: rgb(220, 220, 181);
+    display: inline-block;
+    padding: 20px 50px 10px 70px;
+    border-radius: 10px;
+    margin-left: 37%;
+    margin-top: 20px;
+    box-shadow: 3px 3px 8px black;
+    margin-bottom: 10px;
+}
+
+.addmedlabel{
+    font-size: 19px;
+    font-weight: 800;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    
+}
+.addmedinput {
+    height: 30px;
+    width: 200px;
+    border-radius: 8px;
+    border: none;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.selectaddmed{
+    width: 200px;
+    border: none;
+    border-radius: 8px;
+    height: 30px;
+}
+.addmedbutton{
+    background-color: green;
+
+    padding: 10px 30px;
+    margin-top: 5px;
+    border: none;
+    border-radius: 10px;
+    color: aliceblue;
+    margin-left: 45px;
+    box-shadow:2px 2px  8px rgb(9, 9, 9);
+    margin-bottom: 20px;
+}

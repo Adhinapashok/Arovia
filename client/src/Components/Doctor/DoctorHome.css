@@ -1,0 +1,103 @@
+.docdash-container{
+    width:100%;
+    min-height:100vh;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Navbar */
+
+.docdash-navbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:15px 40px;
+    background:#1f2937;
+}
+
+.docdash-logo{
+    color:white;
+}
+
+.docdash-links a{
+    color:white;
+    margin-right:20px;
+    text-decoration:none;
+    font-weight:500;
+}
+
+.docdash-links a:hover{
+    color:#38bdf8;
+}
+
+/* Dropdown */
+
+.docdash-dropdown{
+    position:relative;
+}
+
+.docdash-dropbtn{
+    background:#38bdf8;
+    border:none;
+    padding:8px 15px;
+    cursor:pointer;
+    color:white;
+    border-radius:4px;
+}
+
+.docdash-dropdown-content{
+    display:none;
+    position:absolute;
+    right:0;
+    background:white;
+    min-width:160px;
+    box-shadow:0 4px 8px rgba(0,0,0,0.2);
+}
+
+.docdash-dropdown-content a{
+    display:block;
+    padding:10px;
+    text-decoration:none;
+    color:black;
+}
+
+.docdash-dropdown-content a:hover{
+    background:#f2f2f2;
+}
+
+.docdash-dropdown:hover .docdash-dropdown-content{
+    display:block;
+}
+
+/* Home */
+
+.docdash-home{
+    text-align:center;
+    margin-top:60px;
+}
+
+.docdash-title{
+    margin-bottom:30px;
+}
+
+.docdash-card-container{
+    display:flex;
+    justify-content:center;
+    gap:30px;
+}
+
+.docdash-card{
+    width:200px;
+    height:120px;
+    background:#38bdf8;
+    color:white;
+    text-decoration:none;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+    border-radius:8px;
+}
+
+.docdash-card:hover{
+    background:#0ea5e9;
+}

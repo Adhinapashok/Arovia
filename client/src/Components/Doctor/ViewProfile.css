@@ -1,0 +1,38 @@
+.profile-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 50px;
+}
+
+.profile-card {
+  width: 750px;
+  padding: 30px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #0f4c81, #1e90ff);
+  color: white;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+.profile-card h2 {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.profile-content {
+  display: flex;
+  gap: 40px;
+  align-items: center;
+}
+
+.profile-image img {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  border: 4px solid white;
+}
+
+.profile-details p {
+  margin: 8px 0;
+  font-size: 16px;
+}
+
