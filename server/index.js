@@ -312,7 +312,7 @@ app.get('/adminviewdoctor', async (req, res) => {
 
 app.get('/adminviewbooking', async (req, res) => {
     try {
-        const data = await Booking.find().populate('user').populate('schedule')
+        const data = await Booking.find().populate('user').populate({ path: 'schedule', populate: { path: 'doctor' } })
         res.status(200).json(data)
     } catch (e) {
         console.log(e)
@@ -337,11 +337,19 @@ app.get('/adminviewprescription', async (req, res) => {
     }
 })
 
-
-
-app.get('/adminviewschedule', async (req, res) => {
+app.get('/userviewall', async (req, res) => {
     try {
-        const data = await Schedule.find().populate('user')
+        const data = await User.find()
+        res.status(200).json(data)
+    } catch (e) {
+        console.log(e)
+    }
+})
+
+app.get('/adminviewschedule/:id', async (req, res) => {
+    try {
+        const id=req.params.id
+        const data = await Schedule.find({doctor:id}).populate('doctor')
         res.status(200).json(data)
     } catch (e) {
         console.log(e)

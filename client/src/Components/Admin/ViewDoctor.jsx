@@ -1,8 +1,8 @@
-// ViewDoctor.js
+// ViewDoctor.js - Updated with fixed action buttons
 import React, { useEffect, useState } from "react";
 import "./ViewDoctor.css";
 import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function ViewDoctor() {
   const [data, setData] = useState([]);
@@ -66,7 +66,11 @@ function ViewDoctor() {
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
   const handleEdit = (doctor) => {
-    navigate('/editdr', { state: doctor });
+    navigate('/home/editdr', { state: doctor });
+  };
+
+  const handleSchedule = (doctor) => {
+    navigate('/home/viewsche', { state: doctor });
   };
 
   return (
@@ -190,6 +194,13 @@ function ViewDoctor() {
                       </td>
                       <td>
                         <div className="action-buttons">
+                          <button 
+                            className="schedule-btn"
+                            onClick={() => handleSchedule(doctor)}
+                            title="View Schedule"
+                          >
+                            <i className="fas fa-calendar-alt"></i>
+                          </button>
                           <button 
                             className="edit-btn"
                             onClick={() => handleEdit(doctor)}

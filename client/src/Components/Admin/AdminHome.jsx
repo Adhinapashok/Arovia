@@ -1,14 +1,149 @@
-// AdminHome.js - Updated version without edit options
+// AdminHome.js - Updated with correct stats from your backend
 import React, { useState, useEffect } from "react";
 import "./AdminHome.css";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
+import axios from "axios";
 
 function AdminHome() {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeSection, setActiveSection] = useState('dashboard');
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [searchTerm, setSearchTerm] = useState('');
+  const [stats, setStats] = useState({
+    doctors: 0,
+    staff: 0,
+    medicines: 0,
+    bookings: 0,
+    feedback: 0,
+    totalPatients: 0,
+    pendingBookings: 0,
+    confirmedBookings: 0,
+    cancelledBookings: 0,
+    prescribedBookings: 0,
+    averageRating: 0,
+    lowStockItems: [],
+    todayAppointments: []
+  });
+  const [loading, setLoading] = useState(true);
+  const [recentActivities, setRecentActivities] = useState([]);
+  
+  const apiUrl = import.meta.env.VITE_API_URL;
+
+  // Fetch all stats from backend
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch all data in parallel
+        const [
+          doctorsRes, 
+          staffRes, 
+          medicinesRes, 
+          bookingsRes, 
+          feedbackRes,
+          usersRes
+        ] = await Promise.all([
+          axios.get(`${apiUrl}adminviewdoctor`),
+          axios.get(`${apiUrl}viewstaff`),
+          axios.get(`${apiUrl}viewmed`),
+          axios.get(`${apiUrl}adminviewbooking`),
+          axios.get(`${apiUrl}adminviewfeedback`),
+          axios.get(`${apiUrl}userviewall`) // You'll need to create this endpoint
+        ]);
+
+        // Process doctors data
+        const doctors = doctorsRes.data;
+        
+        // Process staff data
+        const staff = staffRes.data;
+        
+        // Process medicines data with stock
+        const medicines = medicinesRes.data;
+        
+        // Process bookings data
+        const bookings = bookingsRes.data;
+        const pendingBookings = bookings.filter(b => b.status?.toLowerCase() === 'pending').length;
+        const confirmedBookings = bookings.filter(b => b.status?.toLowerCase() === 'confirmed').length;
+        const cancelledBookings = bookings.filter(b => b.status?.toLowerCase() === 'cancelled').length;
+        const prescribedBookings = bookings.filter(b => b.status?.toLowerCase() === 'prescribed').length;
+
+        // Process feedback data
+        const feedbacks = feedbackRes.data;
+        const avgRating = feedbacks.length > 0 
+          ? (feedbacks.reduce((acc, curr) => acc + parseFloat(curr.rating), 0) / feedbacks.length).toFixed(1)
+          : 0;
+
+        // Get today's date
+        const today = new Date().toISOString().split('T')[0];
+        
+        // Filter today's appointments
+        const todayApps = bookings
+          .filter(b => b.date === today)
+          .slice(0, 4)
+          .map(b => ({
+            id: b._id,
+            time: b.time,
+            patient: b.user?.name || 'Patient',
+            doctor: b.schedule?.doctor?.name || 'Doctor',
+            status: b.status
+          }));
+
+        // Calculate low stock items (stock < 10)
+        const lowStock = medicines
+          .filter(m => m.stock && m.stock[0]?.quantity < 10)
+          .map(m => ({
+            medicine: m.medname,
+            quantity: m.stock[0]?.quantity || 0,
+            id: m._id
+          }))
+          .slice(0, 4);
+
+        // Create recent activities from bookings and feedback
+        const activities = [
+          ...bookings.slice(0, 3).map(b => ({
+            icon: 'calendar-check',
+            text: `New appointment booked for ${b.user?.name || 'Patient'}`,
+            time: b.date === today ? 'Today' : new Date(b.date).toLocaleDateString(),
+            color: '#8b5cf6',
+            path: '/viewbook'
+          })),
+          ...feedbacks.slice(0, 2).map(f => ({
+            icon: 'star',
+            text: `New ${f.rating}-star feedback from ${f.user?.name || 'Patient'}`,
+            time: f.date === today ? 'Today' : new Date(f.date).toLocaleDateString(),
+            color: '#f59e0b',
+            path: '/viewfeed'
+          }))
+        ];
+
+        setStats({
+          doctors: doctors.length,
+          staff: staff.length,
+          medicines: medicines.length,
+          bookings: bookings.length,
+          feedback: feedbacks.length,
+          totalPatients: usersRes.data?.length || 0,
+          pendingBookings,
+          confirmedBookings,
+          cancelledBookings,
+          prescribedBookings,
+          averageRating: avgRating,
+          lowStockItems: lowStock,
+          todayAppointments: todayApps
+        });
+
+        setRecentActivities(activities);
+
+      } catch (error) {
+        console.error("Error fetching stats:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
 
   // Update time every second
   useEffect(() => {
@@ -23,11 +158,11 @@ function AdminHome() {
     const path = location.pathname;
     if (path === '/home') {
       setActiveSection('dashboard');
-    } else if (path.includes('/adddr') || path.includes('/viewdr')) {
+    } else if (path.includes('/adddr') || path.includes('/viewdr') || path.includes('/editdr')) {
       setActiveSection('doctors');
-    } else if (path.includes('/addstf') || path.includes('/viewstf')) {
+    } else if (path.includes('/addstf') || path.includes('/viewstf') || path.includes('/editstf')) {
       setActiveSection('staff');
-    } else if (path.includes('/addmed') || path.includes('/viewmed')) {
+    } else if (path.includes('/addmed') || path.includes('/viewmed') || path.includes('/editmed')) {
       setActiveSection('medicines');
     } else if (path.includes('/viewbook')) {
       setActiveSection('bookings');
@@ -35,12 +170,6 @@ function AdminHome() {
       setActiveSection('feedback');
     } else if (path.includes('/admchngpas')) {
       setActiveSection('security');
-    } else if (path.includes('/viewsche')) {
-      setActiveSection('schedule');
-    } else if (path.includes('/viewpresc')) {
-      setActiveSection('prescriptions');
-    } else if (path.includes('/addstk')) {
-      setActiveSection('stock');
     }
   }, [location]);
 
@@ -58,26 +187,23 @@ function AdminHome() {
     second: '2-digit'
   });
 
-  // Navigation handlers - Updated paths to include /home prefix
+  // Navigation handlers
   const handleNavigation = (path, section) => {
     setActiveSection(section);
     navigate(`/home${path}`);
   };
 
-  // Stats data
-  const stats = {
-    doctors: 75,
-    staff: 45,
-    medicines: 120,
-    bookings: 310,
-    feedback: 250,
-    prescriptions: 180,
-    schedule: 45,
-    stock: 65
+  // Logout handler
+  const handleLogout = () => {
+    sessionStorage.clear();
+    navigate('/');
   };
 
   // Check if current path is dashboard
   const isDashboard = location.pathname === '/home';
+
+  // Get admin name from session
+  const adminName = "Admin"; // You can get this from session if stored
 
   return (
     <div className="adminhome">
@@ -95,27 +221,27 @@ function AdminHome() {
           <span className="logo-badge">Healthcare</span>
         </div>
 
-        <div className="admin-profile-card" onClick={() => handleNavigation('/viewdrprof', 'profile')}>
+        <div className="admin-profile-card">
           <div className="profile-avatar">
             <div className="avatar-icon">
-              <i className="fas fa-user-md"></i>
+              <i className="fas fa-user-shield"></i>
             </div>
             <div className="profile-info">
-              <h4>Dr. Admin</h4>
+              <h4>Dr. {adminName}</h4>
               <p>Administrator</p>
             </div>
           </div>
           <div className="profile-stats">
             <div className="stat">
-              <span className="stat-value">12</span>
-              <span className="stat-label">Years</span>
-            </div>
-            <div className="stat">
-              <span className="stat-value">5k+</span>
+              <span className="stat-value">{stats.totalPatients}</span>
               <span className="stat-label">Patients</span>
             </div>
             <div className="stat">
-              <span className="stat-value">98%</span>
+              <span className="stat-value">{stats.doctors}</span>
+              <span className="stat-label">Doctors</span>
+            </div>
+            <div className="stat">
+              <span className="stat-value">{stats.averageRating}</span>
               <span className="stat-label">Rating</span>
             </div>
           </div>
@@ -224,18 +350,6 @@ function AdminHome() {
             </div>
           </div>
 
-          {/* Stock */}
-          <div 
-            className={`nav-item ${activeSection === 'stock' ? 'active' : ''}`}
-            onClick={() => handleNavigation('/addstk', 'stock')}
-          >
-            <i className="fas fa-boxes"></i>
-            <div className="nav-info">
-              <span className="nav-label">Stock</span>
-              <span className="nav-count">{stats.stock} Items</span>
-            </div>
-          </div>
-
           {/* Bookings */}
           <div 
             className={`nav-item ${activeSection === 'bookings' ? 'active' : ''}`}
@@ -244,31 +358,7 @@ function AdminHome() {
             <i className="fas fa-calendar-check"></i>
             <div className="nav-info">
               <span className="nav-label">Bookings</span>
-              <span className="nav-count">{stats.bookings} Appointments</span>
-            </div>
-          </div>
-
-          {/* Prescriptions */}
-          <div 
-            className={`nav-item ${activeSection === 'prescriptions' ? 'active' : ''}`}
-            onClick={() => handleNavigation('/viewpresc', 'prescriptions')}
-          >
-            <i className="fas fa-prescription"></i>
-            <div className="nav-info">
-              <span className="nav-label">Prescriptions</span>
-              <span className="nav-count">{stats.prescriptions} Total</span>
-            </div>
-          </div>
-
-          {/* Schedule */}
-          <div 
-            className={`nav-item ${activeSection === 'schedule' ? 'active' : ''}`}
-            onClick={() => handleNavigation('/viewsche', 'schedule')}
-          >
-            <i className="fas fa-clock"></i>
-            <div className="nav-info">
-              <span className="nav-label">Schedule</span>
-              <span className="nav-count">{stats.schedule} Appointments</span>
+              <span className="nav-count">{stats.bookings} Total</span>
             </div>
           </div>
 
@@ -312,33 +402,25 @@ function AdminHome() {
             </div>
           </div>
           <div className="header-right">
-            <div className="search-box">
-              <i className="fas fa-search"></i>
-              <input 
-                type="text" 
-                placeholder="Search..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <div className="header-actions">
-              <button className="notification-btn">
-                <i className="far fa-bell"></i>
-                <span className="notification-badge">3</span>
-              </button>
-              <button 
-                className="settings-btn"
-                onClick={() => handleNavigation('/viewdrprof', 'profile')}
-              >
-                <i className="fas fa-user-circle"></i>
-              </button>
-            </div>
+            <button className="logout-btn" onClick={handleLogout}>
+              <i className="fas fa-sign-out-alt"></i>
+              <span>Logout</span>
+            </button>
           </div>
         </div>
 
-        {/* Page Content - This is where the child routes will render */}
+        {/* Page Content */}
         <div className="page-container">
-          {isDashboard ? <DashboardHome stats={stats} onNavigate={handleNavigation} /> : <Outlet />}
+          {isDashboard ? (
+            <DashboardHome 
+              stats={stats} 
+              onNavigate={handleNavigation} 
+              loading={loading}
+              recentActivities={recentActivities}
+            />
+          ) : (
+            <Outlet />
+          )}
         </div>
       </div>
     </div>
@@ -346,15 +428,16 @@ function AdminHome() {
 }
 
 // Dashboard Home Component
-const DashboardHome = ({ stats, onNavigate }) => {
-  const recentActivities = [
-    { icon: 'user-md', text: 'New doctor Dr. Smith joined', time: '5 min ago', color: '#3b82f6', path: '/viewdr' },
-    { icon: 'calendar-check', text: 'New appointment booked', time: '15 min ago', color: '#8b5cf6', path: '/viewbook' },
-    { icon: 'pills', text: 'Medicine stock updated', time: '1 hour ago', color: '#ec4899', path: '/viewmed' },
-    { icon: 'star', text: 'New feedback received', time: '2 hours ago', color: '#f59e0b', path: '/viewfeed' },
-    { icon: 'user', text: 'New staff member added', time: '3 hours ago', color: '#10b981', path: '/viewstf' },
-    { icon: 'prescription', text: 'Prescription generated', time: '4 hours ago', color: '#6366f1', path: '/viewpresc' }
-  ];
+const DashboardHome = ({ stats, onNavigate, loading, recentActivities }) => {
+  
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p>Loading dashboard...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="dashboard-home">
@@ -366,7 +449,7 @@ const DashboardHome = ({ stats, onNavigate }) => {
           <h4>Total Doctors</h4>
           <span className="stat-number">{stats.doctors}</span>
           <span className="stat-trend">
-            <i className="fas fa-arrow-up"></i> 12% this month
+            <i className="fas fa-check-circle"></i> Active
           </span>
         </div>
 
@@ -377,7 +460,7 @@ const DashboardHome = ({ stats, onNavigate }) => {
           <h4>Total Staff</h4>
           <span className="stat-number">{stats.staff}</span>
           <span className="stat-trend">
-            <i className="fas fa-arrow-up"></i> 8% this month
+            <i className="fas fa-check-circle"></i> Active
           </span>
         </div>
 
@@ -387,8 +470,8 @@ const DashboardHome = ({ stats, onNavigate }) => {
           </div>
           <h4>Medicines</h4>
           <span className="stat-number">{stats.medicines}</span>
-          <span className="stat-trend down">
-            <i className="fas fa-arrow-down"></i> 5% low stock
+          <span className="stat-trend">
+            <i className="fas fa-exclamation-triangle"></i> {stats.lowStockItems.length} Low Stock
           </span>
         </div>
 
@@ -396,10 +479,10 @@ const DashboardHome = ({ stats, onNavigate }) => {
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #10b981, #059669)' }}>
             <i className="fas fa-calendar-check"></i>
           </div>
-          <h4>Bookings</h4>
+          <h4>Total Bookings</h4>
           <span className="stat-number">{stats.bookings}</span>
           <span className="stat-trend">
-            <i className="fas fa-arrow-up"></i> 23% this week
+            <i className="fas fa-clock"></i> {stats.pendingBookings} Pending
           </span>
         </div>
 
@@ -410,18 +493,18 @@ const DashboardHome = ({ stats, onNavigate }) => {
           <h4>Feedback</h4>
           <span className="stat-number">{stats.feedback}</span>
           <span className="stat-trend">
-            <i className="fas fa-arrow-up"></i> 15% this week
+            <i className="fas fa-star"></i> {stats.averageRating} Avg
           </span>
         </div>
 
-        <div className="stat-card" onClick={() => onNavigate('/viewpresc', 'prescriptions')}>
+        <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }}>
-            <i className="fas fa-prescription"></i>
+            <i className="fas fa-user-check"></i>
           </div>
-          <h4>Prescriptions</h4>
-          <span className="stat-number">{stats.prescriptions}</span>
+          <h4>Patients</h4>
+          <span className="stat-number">{stats.totalPatients}</span>
           <span className="stat-trend">
-            <i className="fas fa-arrow-up"></i> 7% this week
+            <i className="fas fa-arrow-up"></i> Registered
           </span>
         </div>
       </div>
@@ -430,113 +513,117 @@ const DashboardHome = ({ stats, onNavigate }) => {
         <div className="grid-item recent-activities">
           <div className="section-header">
             <h2>Recent Activities</h2>
-            <span className="view-all" onClick={() => onNavigate('/viewdr', 'doctors')}>
+            <span className="view-all" onClick={() => onNavigate('/viewbook', 'bookings')}>
               View All <i className="fas fa-arrow-right"></i>
             </span>
           </div>
 
           <div className="activity-list">
-            {recentActivities.map((activity, index) => (
-              <div 
-                className="activity-item" 
-                key={index}
-                onClick={() => onNavigate(activity.path, activity.icon)}
-              >
-                <div className="activity-icon" style={{ background: `linear-gradient(135deg, ${activity.color}, ${activity.color}dd)` }}>
-                  <i className={`fas fa-${activity.icon}`}></i>
+            {recentActivities.length > 0 ? (
+              recentActivities.map((activity, index) => (
+                <div 
+                  className="activity-item" 
+                  key={index}
+                  onClick={() => onNavigate(activity.path, '')}
+                >
+                  <div className="activity-icon" style={{ background: `linear-gradient(135deg, ${activity.color}, ${activity.color}dd)` }}>
+                    <i className={`fas fa-${activity.icon}`}></i>
+                  </div>
+                  <div className="activity-details">
+                    <p>{activity.text}</p>
+                    <span className="activity-time">{activity.time}</span>
+                  </div>
+                  <i className="fas fa-chevron-right" style={{ color: '#64748b' }}></i>
                 </div>
-                <div className="activity-details">
-                  <p>{activity.text}</p>
-                  <span className="activity-time">{activity.time}</span>
-                </div>
-                <i className="fas fa-chevron-right" style={{ color: '#64748b' }}></i>
+              ))
+            ) : (
+              <div className="no-activities">
+                <i className="fas fa-inbox"></i>
+                <p>No recent activities</p>
               </div>
-            ))}
+            )}
           </div>
         </div>
 
         <div className="grid-item upcoming-appointments">
           <div className="section-header">
-            <h2>Today's Schedule</h2>
-            <span className="view-all" onClick={() => onNavigate('/viewsche', 'schedule')}>
+            <h2>Today's Appointments</h2>
+            <span className="view-all" onClick={() => onNavigate('/viewbook', 'bookings')}>
               View All <i className="fas fa-arrow-right"></i>
             </span>
           </div>
 
           <div className="schedule-list">
-            <div className="schedule-item">
-              <div className="schedule-time">09:00 AM</div>
-              <div className="schedule-details">
-                <h4>Dr. Sarah Johnson</h4>
-                <p>General Checkup - Room 101</p>
+            {stats.todayAppointments.length > 0 ? (
+              stats.todayAppointments.map((appointment, index) => (
+                <div className="schedule-item" key={index}>
+                  <div className="schedule-time">{appointment.time}</div>
+                  <div className="schedule-details">
+                    <h4>{appointment.patient}</h4>
+                    <p>{appointment.doctor}</p>
+                  </div>
+                  <span className={`schedule-status ${appointment.status?.toLowerCase()}`}>
+                    {appointment.status}
+                  </span>
+                </div>
+              ))
+            ) : (
+              <div className="no-appointments">
+                <i className="fas fa-calendar-check"></i>
+                <p>No appointments scheduled for today</p>
               </div>
-              <span className="schedule-status confirmed">Confirmed</span>
-            </div>
-            <div className="schedule-item">
-              <div className="schedule-time">10:30 AM</div>
-              <div className="schedule-details">
-                <h4>Dr. Michael Chen</h4>
-                <p>Cardiology Consultation</p>
-              </div>
-              <span className="schedule-status pending">Pending</span>
-            </div>
-            <div className="schedule-item">
-              <div className="schedule-time">02:00 PM</div>
-              <div className="schedule-details">
-                <h4>Dr. Emily Williams</h4>
-                <p>Pediatric Checkup</p>
-              </div>
-              <span className="schedule-status confirmed">Confirmed</span>
-            </div>
-            <div className="schedule-item">
-              <div className="schedule-time">04:30 PM</div>
-              <div className="schedule-details">
-                <h4>Dr. James Brown</h4>
-                <p>Surgery Follow-up</p>
-              </div>
-              <span className="schedule-status confirmed">Confirmed</span>
-            </div>
+            )}
           </div>
         </div>
 
         <div className="grid-item low-stock">
           <div className="section-header">
             <h2>Low Stock Alert</h2>
-            <span className="view-all" onClick={() => onNavigate('/addstk', 'stock')}>
+            <span className="view-all" onClick={() => onNavigate('/viewmed', 'medicines')}>
               Manage Stock <i className="fas fa-arrow-right"></i>
             </span>
           </div>
 
           <div className="stock-list">
-            <div className="stock-item">
-              <div className="stock-info">
-                <h4>Paracetamol</h4>
-                <p>Stock: 15 units</p>
+            {stats.lowStockItems.length > 0 ? (
+              stats.lowStockItems.map((item, index) => (
+                <div className="stock-item" key={index}>
+                  <div className="stock-info">
+                    <h4>{item.medicine}</h4>
+                    <p>Stock: {item.quantity} units</p>
+                  </div>
+                  <span className={`stock-status ${item.quantity < 5 ? 'critical' : 'low'}`}>
+                    {item.quantity < 5 ? 'Critical' : 'Low'}
+                  </span>
+                </div>
+              ))
+            ) : (
+              <div className="no-stock">
+                <i className="fas fa-check-circle"></i>
+                <p>All items are well stocked</p>
               </div>
-              <span className="stock-status low">Low</span>
-            </div>
-            <div className="stock-item">
-              <div className="stock-info">
-                <h4>Amoxicillin</h4>
-                <p>Stock: 8 units</p>
-              </div>
-              <span className="stock-status critical">Critical</span>
-            </div>
-            <div className="stock-item">
-              <div className="stock-info">
-                <h4>Ibuprofen</h4>
-                <p>Stock: 12 units</p>
-              </div>
-              <span className="stock-status low">Low</span>
-            </div>
-            <div className="stock-item">
-              <div className="stock-info">
-                <h4>Insulin</h4>
-                <p>Stock: 5 units</p>
-              </div>
-              <span className="stock-status critical">Critical</span>
-            </div>
+            )}
           </div>
+        </div>
+      </div>
+
+      {/* Booking Stats Summary */}
+      <div className="stats-summary">
+        <div className="summary-item">
+          <span className="summary-label">Pending</span>
+          <span className="summary-value pending">{stats.pendingBookings}</span>
+        </div>
+        <div className="summary-item">
+          <span className="summary-label">Confirmed</span>
+          <span className="summary-value confirmed">{stats.confirmedBookings}</span>
+        </div>
+        <div className="summary-item">
+          <span className="summary-label">Prescribed</span>
+          <span className="summary-value prescribed">{stats.prescribedBookings}</span>
+        </div>
+        <div className="summary-item">
+          <span className="summary-label">Cancelled</span>
+          <span className="summary-value cancelled">{stats.cancelledBookings}</span>
         </div>
       </div>
     </div>

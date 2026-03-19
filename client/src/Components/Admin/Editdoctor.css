@@ -1,8 +1,8 @@
-/* Add to AddMedicine.css */
+/* Add to Admin.css */
 
-/* Edit Medicine Container */
-.edit-medicine-container {
-  max-width: 800px;
+/* Edit Doctor Container */
+.edit-doctor-container {
+  max-width: 1000px;
   margin: 0 auto;
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(10px);
@@ -79,35 +79,7 @@
   opacity: 0.9;
 }
 
-/* Form Grid */
-.form-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  animation: fadeIn 0.5s ease-out forwards;
-  opacity: 0;
-}
-
-.form-group:nth-child(1) { animation-delay: 0.1s; }
-.form-group:nth-child(2) { animation-delay: 0.2s; }
-.form-group:nth-child(3) { animation-delay: 0.3s; }
-.form-group:nth-child(4) { animation-delay: 0.4s; }
-.form-group:nth-child(5) { animation-delay: 0.5s; }
-.form-group:nth-child(6) { animation-delay: 0.6s; }
-.form-group:nth-child(7) { animation-delay: 0.7s; }
-
-@keyframes fadeIn {
-  to {
-    opacity: 1;
-  }
-}
-
+/* Form labels white */
 .form-group label {
   color: #ffffff;
   font-size: 0.95rem;
@@ -126,6 +98,78 @@
 .required {
   color: #ef4444;
   margin-left: 0.2rem;
+}
+
+/* Photo Upload Section */
+.photo-upload-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2.5rem;
+}
+
+.photo-preview {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2));
+  border: 3px dashed rgba(59, 130, 246, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  margin-bottom: 0.5rem;
+}
+
+.photo-preview:hover {
+  border-color: #3b82f6;
+  transform: scale(1.05);
+  box-shadow: 0 10px 30px -10px rgba(59, 130, 246, 0.5);
+}
+
+.photo-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #ffffff;
+}
+
+.photo-placeholder i {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  color: #3b82f6;
+}
+
+.photo-placeholder span {
+  font-size: 0.9rem;
+  color: #ffffff;
+}
+
+.photo-hint {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+/* Form Grid */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
 }
 
 .form-group input,
@@ -159,21 +203,8 @@
   background: rgba(239, 68, 68, 0.05);
 }
 
-.form-group input.error:focus,
-.form-group select.error:focus {
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
-}
-
 .form-group input::placeholder {
   color: #94a3b8;
-}
-
-.form-group select {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 1rem center;
-  padding-right: 2.5rem;
 }
 
 .form-group select option {
@@ -188,23 +219,10 @@
   display: flex;
   align-items: center;
   gap: 0.3rem;
-  animation: shake 0.3s ease-in-out;
-}
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
 }
 
 .error-message::before {
   content: '⚠️';
-  font-size: 0.8rem;
-}
-
-/* Edit Medicine Form */
-.edit-medicine-form {
-  width: 100%;
 }
 
 /* Form Actions */
@@ -248,26 +266,6 @@
   background: linear-gradient(135deg, #3b82f6, #8b5cf6);
   color: white;
   box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.5);
-  position: relative;
-  overflow: hidden;
-}
-
-.submit-btn::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-  transform: translate(-50%, -50%);
-  transition: width 0.5s, height 0.5s;
-}
-
-.submit-btn:hover::before {
-  width: 300px;
-  height: 300px;
 }
 
 .submit-btn:hover:not(:disabled) {
@@ -280,7 +278,6 @@
   cursor: not-allowed;
 }
 
-/* Loading Spinner */
 .fa-spinner {
   animation: spin 1s linear infinite;
 }
@@ -292,7 +289,7 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .edit-medicine-container {
+  .edit-doctor-container {
     padding: 1.5rem;
   }
 

@@ -1,6 +1,6 @@
-/* ViewSchedule.css */
+/* ViewFeedback.css */
 
-.view-schedule-container {
+.view-feedback-container {
   max-width: 1400px;
   margin: 0 auto;
   background: rgba(255, 255, 255, 0.05);
@@ -23,7 +23,7 @@
   }
 }
 
-/* Header Section - Matching other components */
+/* Header Section */
 .view-header {
   display: flex;
   justify-content: space-between;
@@ -69,92 +69,94 @@
   font-weight: 600;
 }
 
-/* Doctor Info Card */
-.doctor-info-card {
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
   background: rgba(255, 255, 255, 0.03);
   border-radius: 20px;
   padding: 1.5rem;
   display: flex;
   align-items: center;
-  gap: 2rem;
+  gap: 1rem;
   border: 1px solid rgba(255, 255, 255, 0.05);
-  margin-bottom: 2rem;
   transition: all 0.3s ease;
 }
 
-.doctor-info-card:hover {
-  background: rgba(59, 130, 246, 0.05);
-  border-color: rgba(59, 130, 246, 0.2);
-  transform: translateY(-2px);
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px -10px rgba(59, 130, 246, 0.3);
 }
 
-.doctor-avatar {
-  width: 70px;
-  height: 70px;
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-  border-radius: 18px;
+.stat-card.total {
+  background: linear-gradient(145deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05));
+}
+
+.stat-card.average {
+  background: linear-gradient(145deg, rgba(139, 92, 246, 0.1), rgba(139, 92, 246, 0.05));
+}
+
+.stat-card.excellent {
+  background: linear-gradient(145deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
+}
+
+.stat-card.poor {
+  background: linear-gradient(145deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05));
+}
+
+.stat-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2rem;
-  color: white;
-  box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.5);
+  font-size: 1.5rem;
 }
 
-.doctor-details {
-  flex: 1;
-}
-
-.doctor-details h3 {
-  color: white;
-  font-size: 1.3rem;
-  margin-bottom: 0.5rem;
-}
-
-.doctor-meta {
-  display: flex;
-  gap: 1.5rem;
-  flex-wrap: wrap;
-}
-
-.doctor-meta span {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #94a3b8;
-  font-size: 0.9rem;
-}
-
-.doctor-meta span i {
+.stat-card.total .stat-icon {
+  background: rgba(59, 130, 246, 0.2);
   color: #3b82f6;
 }
 
-.schedule-stats {
+.stat-card.average .stat-icon {
+  background: rgba(139, 92, 246, 0.2);
+  color: #8b5cf6;
+}
+
+.stat-card.excellent .stat-icon {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+}
+
+.stat-card.poor .stat-icon {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+.stat-details {
   display: flex;
-  gap: 2rem;
-  padding: 0 1rem;
+  flex-direction: column;
 }
 
-.stat-item {
-  text-align: center;
-}
-
-.stat-item .stat-value {
-  display: block;
-  font-size: 1.5rem;
+.stat-value {
+  font-size: 1.8rem;
   font-weight: 700;
   color: white;
   line-height: 1.2;
 }
 
-.stat-item .stat-label {
-  font-size: 0.75rem;
+.stat-label {
+  font-size: 0.85rem;
   color: #94a3b8;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
-/* Search and Filter Bar - Matching other components */
+/* Search and Filter Bar */
 .search-filter-bar {
   display: flex;
   gap: 1rem;
@@ -213,6 +215,33 @@
   background: rgba(239, 68, 68, 0.1);
 }
 
+.filter-options {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.filter-select {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 40px;
+  padding: 0.5rem 2rem 0.5rem 1rem;
+  color: white;
+  font-size: 0.95rem;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.8rem center;
+  min-width: 150px;
+}
+
+.filter-select option {
+  background: #1e293b;
+  color: white;
+}
+
 .refresh-btn {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -229,15 +258,15 @@
   transform: rotate(180deg);
 }
 
-/* Schedule Grid */
-.schedule-grid {
+/* Feedback Grid */
+.feedback-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
 
-.schedule-card {
+.feedback-card {
   background: rgba(255, 255, 255, 0.03);
   border-radius: 20px;
   padding: 1.5rem;
@@ -247,113 +276,138 @@
   overflow: hidden;
 }
 
-.schedule-card::before {
+.feedback-card::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
 }
 
-.schedule-card.upcoming::before {
-  background: linear-gradient(90deg, #10b981, #059669);
-}
-
-.schedule-card.past::before {
-  background: linear-gradient(90deg, #64748b, #475569);
-}
-
-.schedule-card:hover {
+.feedback-card:hover {
   transform: translateY(-5px);
   background: rgba(59, 130, 246, 0.05);
   border-color: rgba(59, 130, 246, 0.2);
   box-shadow: 0 10px 30px -10px rgba(59, 130, 246, 0.3);
 }
 
-.schedule-card-header {
+.feedback-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
-.schedule-number {
+.feedback-number {
   color: #94a3b8;
   font-size: 0.9rem;
   font-weight: 500;
 }
 
-.status-badge {
+.feedback-date {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #94a3b8;
+  font-size: 0.85rem;
+}
+
+.feedback-date i {
+  color: #3b82f6;
+}
+
+.feedback-rating {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.stars {
+  display: flex;
+  gap: 0.2rem;
+}
+
+.stars i {
+  font-size: 1.1rem;
+}
+
+.stars .filled {
+  color: #fbbf24;
+}
+
+.stars .empty {
+  color: #475569;
+}
+
+.rating-badge {
   padding: 0.3rem 0.8rem;
   border-radius: 20px;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   font-weight: 600;
 }
 
-.status-badge.upcoming {
+.rating-badge.excellent {
   background: rgba(16, 185, 129, 0.1);
   color: #10b981;
   border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
-.status-badge.past {
-  background: rgba(100, 116, 139, 0.1);
-  color: #94a3b8;
-  border: 1px solid rgba(100, 116, 139, 0.2);
-}
-
-.schedule-card-body {
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-  margin-bottom: 1.5rem;
-}
-
-.date-info,
-.time-info {
-  display: flex;
-  gap: 1rem;
-  align-items: flex-start;
-}
-
-.date-info i,
-.time-info i {
-  font-size: 1.2rem;
+.rating-badge.good {
+  background: rgba(59, 130, 246, 0.1);
   color: #3b82f6;
-  margin-top: 0.2rem;
+  border: 1px solid rgba(59, 130, 246, 0.2);
 }
 
-.date-full,
-.time-range {
-  display: block;
-  color: white;
-  font-weight: 500;
-  margin-bottom: 0.2rem;
+.rating-badge.average {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.2);
 }
 
-.date-day,
-.time-duration {
+.rating-badge.poor {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.feedback-review {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.feedback-review i {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  color: #3b82f6;
+  opacity: 0.2;
+  font-size: 1.5rem;
+}
+
+.feedback-review p {
+  color: #e2e8f0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-left: 1.5rem;
+  font-style: italic;
+}
+
+.feedback-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.rating-label {
   font-size: 0.85rem;
   color: #94a3b8;
-}
-
-.schedule-card-footer {
-  padding-top: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.doctor-name {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #94a3b8;
-  font-size: 0.9rem;
-}
-
-.doctor-name i {
-  color: #3b82f6;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 /* Loading State */
@@ -398,8 +452,7 @@
   margin-bottom: 1.5rem;
 }
 
-.no-data button,
-.no-data-content button {
+.no-data button {
   background: rgba(59, 130, 246, 0.1);
   border: 1px solid rgba(59, 130, 246, 0.2);
   color: #3b82f6;
@@ -409,35 +462,12 @@
   transition: all 0.3s ease;
 }
 
-.no-data button:hover,
-.no-data-content button:hover {
+.no-data button:hover {
   background: rgba(59, 130, 246, 0.2);
   transform: translateY(-2px);
 }
 
-.no-data-content {
-  text-align: center;
-  padding: 3rem;
-}
-
-.no-data-content i {
-  font-size: 4rem;
-  color: #ef4444;
-  margin-bottom: 1rem;
-}
-
-.no-data-content h2 {
-  color: white;
-  font-size: 1.8rem;
-  margin-bottom: 0.5rem;
-}
-
-.no-data-content p {
-  color: #94a3b8;
-  margin-bottom: 2rem;
-}
-
-/* Pagination - Matching other components */
+/* Pagination */
 .pagination {
   display: flex;
   justify-content: center;
@@ -514,13 +544,13 @@
 
 /* Responsive Design */
 @media (max-width: 1024px) {
-  .schedule-stats {
-    gap: 1rem;
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 768px) {
-  .view-schedule-container {
+  .view-feedback-container {
     padding: 1rem;
   }
 
@@ -528,21 +558,6 @@
     flex-direction: column;
     gap: 1rem;
     text-align: center;
-  }
-
-  .doctor-info-card {
-    flex-direction: column;
-    text-align: center;
-    gap: 1rem;
-  }
-
-  .doctor-meta {
-    justify-content: center;
-  }
-
-  .schedule-stats {
-    width: 100%;
-    justify-content: center;
   }
 
   .search-filter-bar {
@@ -553,11 +568,21 @@
     min-width: auto;
   }
 
-  .refresh-btn {
+  .filter-options {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .filter-select {
     width: 100%;
   }
 
-  .schedule-grid {
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .feedback-grid {
     grid-template-columns: 1fr;
   }
 
