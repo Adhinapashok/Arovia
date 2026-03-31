@@ -122,11 +122,11 @@ function ChangePassword({ role }) {
         
         // Navigate based on role
         if (role === 'Admin') {
-          nav('/home');
+          nav('/');
         } else if (role === 'Doctor') {
-          nav('/drhome');
+          nav('/');
         } else {
-          nav('/userhome');
+          nav('/');
         }
       } else {
         alert(res.data.message || 'Error updating password');

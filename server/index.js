@@ -118,7 +118,11 @@ app.post('/adddr', upload.single("photo"), async (req, res) => {
         const photo = req.file.filename
 
         const data = await Login.findOne({ Username: email })
+        const data2=await Staff.findOne({email: req.body.email})
         if (data) {
+            res.status(200).json({ status: "no", message: "Email Already Exists" })
+        }
+        if (data2) {
             res.status(200).json({ status: "no", message: "Email Already Exists" })
         }
         else {
@@ -210,6 +214,15 @@ app.post('/addstaff', upload.single("photo"), async (req, res) => {
     const { staff, email, mobile, gender, dob, qualification, role, experience } = req.body;
     const photo = req.file.filename
     try {
+        const data=await Login.findOne({Username: req.body.email})
+        const data2=await Staff.findOne({email: req.body.email})
+        
+        if (data) {
+            return res.status(200).json({ status: "error", message: "Email already exists" });
+        }
+        if (data2) {
+            return res.status(200).json({ status: "error", message: "Email already exists" });
+        }
         const newstaff = new Staff({
             name: staff,
             email,
@@ -277,6 +290,18 @@ app.post('/editdr', upload.single('photo'), async (req, res) => {
         let updateData = {
             ...req.body
         }
+        const doc=await Doctor.findOne({_id:id})
+        console.log(doc);
+        
+        const data=await Login.findOne({Username: req.body.email,_id: { $ne: doc.login }})
+        const data2=await Staff.findOne({email: req.body.email})
+        
+        if (data) {
+            return res.status(200).json({ status: "error", message: "Email already exists" });
+        }
+        if (data2) {
+            return res.status(200).json({ status: "error", message: "Email already exists" });
+        }
 
         if (req.file) {
             updateData.photo = req.file.filename
@@ -323,6 +348,16 @@ app.post('/editstaff', upload.single("photo"), async (req, res) => {
 
         let updateData = {
             ...req.body
+        }
+
+        const data=await Login.findOne({Username: req.body.email})
+        const data2=await Staff.findOne({email: req.body.email,_id: { $ne: id }})
+        
+        if (data) {
+            return res.status(200).json({ status: "error", message: "Email already exists" });
+        }
+        if (data2) {
+            return res.status(200).json({ status: "error", message: "Email already exists" });
         }
 
         if (req.file) {
@@ -439,7 +474,9 @@ app.get('/viewmed', async (req, res) => {
 app.get('/deletedr/:id', async (req, res) => {
     try {
         const id = req.params.id
-        const data = await Doctor.findOneAndDelete({ _id: id })
+        const d= await Doctor.findOne({ _id: id })
+        await Login.findOneAndDelete({ _id: d.login })
+        await Doctor.findOneAndDelete({ _id: id })
         res.status(200).json({ status: "ok" })
     } catch (e) {
         console.log(e)
@@ -631,8 +668,15 @@ app.post('/usersigup', upload.single("photo"), async (req, res) => {
     try {
         // ✅ Check if email already exists
         const existingUser = await Login.findOne({ Username: email });
+        const data2=await Staff.findOne({email: req.body.email})
 
         if (existingUser) {
+            return res.status(400).json({
+                status: "error",
+                message: "Email already registered"
+            });
+        }
+        if (data2) {
             return res.status(400).json({
                 status: "error",
                 message: "Email already registered"
@@ -977,6 +1021,11 @@ app.post('/updateuserprofile', upload.single('photo'), async (req, res) => {
         const user = await User.findOne({ login: lid });
         if (!user) {
             return res.status(404).json({ status: "error", message: "User not found" });
+        }
+        const data=await Login.findOne({Username: email,_id: { $ne: lid }})
+        
+        if (data) {
+            return res.status(200).json({ status: "error", message: "Email already exists" });
         }
 
         // Prepare update data
